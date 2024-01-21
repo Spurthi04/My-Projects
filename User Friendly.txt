@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #todoApp {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 300px;
+        }
+
+        #todoInput {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            font-size: 16px;
+            outline: none;
+        }
+
+        #todoList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .task input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .task button {
+            margin-left: auto;
+            background-color: #ff5c5c;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="todoApp">
+        <input type="text" id="todoInput" placeholder="Add a new task...">
+        <ul id="todoList"></ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const todoInput = document.getElementById('todoInput');
+            const todoList = document.getElementById('todoList');
+
+            // Load tasks from local storage
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+            // Render tasks
+            function renderTasks() {
+                todoList.innerHTML = '';
+                tasks.forEach((task, index) => {
+                    const taskElement = document.createElement('li');
+                    taskElement.classList.add('task');
+                    taskElement.innerHTML = `
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${index})">
+                        <span>${task.text}</span>
+                        <button onclick="deleteTask(${index})">Delete</button>
+                    `;
+                    todoList.appendChild(taskElement);
+                });
+            }
+
+            // Add a new task
+            function addTask() {
+                const text = todoInput.value.trim();
+                if (text !== '') {
+                    tasks.push({ text, completed: false });
+                    saveTasks();
+                    renderTasks();
+                    todoInput.value = '';
+                }
+            }
+
+            // Toggle task completion
+            function toggleTask(index) {
+                tasks[index].completed = !tasks[index].completed;
+                saveTasks();
+                renderTasks();
+            }
+
+            // Delete a task
+            function deleteTask(index) {
+                tasks.splice(index, 1);
+                saveTasks();
+                renderTasks();
+            }
+
+            // Save tasks to local storage
+            function saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+
+            // Initial rendering
+            renderTasks();
+
+            // Event listeners
+            todoInput.addEventListener('keyup', function (event) {
+                if (event.key === 'Enter') {
+                    addTask();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
